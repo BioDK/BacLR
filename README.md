@@ -121,17 +121,22 @@ To enable an optional module, set its flag (e.g. `run_checkm: true`) in
 
 ## What each output means
 
+Result files are organised per sample under a `{sample}/` subfolder (the
+`sample` value in `config/config.yaml`), so several samples can be processed
+without their outputs colliding. The paths below use `{sample}` as a
+placeholder.
+
 | Output | Meaning |
 |---|---|
-| `results/qc/nanoplot_raw/` | Read-length and quality summary of the raw reads |
-| `results/filtered_reads/` | Reads after quality/length filtering |
-| `results/assembly/flye/assembly.fasta` | The reconstructed genome |
-| `results/assembly/flye/assembly_info.txt` | Per-contig length, coverage, circular yes/no |
-| `results/qc/quast/report.tsv` | Assembly metrics: contigs, N50, length, GC% |
-| `results/annotation/prokka/` | Predicted genes, rRNA, tRNA, functional annotation |
-| `results/summary/summary_table.tsv` | One-glance summary merging QC and annotation |
-| `results/qc/checkm2/` | Completeness and contamination *(if enabled)* |
-| `results/taxonomy/gtdbtk/` | Taxonomic classification *(if enabled)* |
+| `results/qc/{sample}/nanoplot_raw/` | Read-length and quality summary of the raw reads |
+| `results/filtered_reads/{sample}.filtered.fastq.gz` | Reads after quality/length filtering |
+| `results/assembly/{sample}/flye/assembly.fasta` | The reconstructed genome |
+| `results/assembly/{sample}/flye/assembly_info.txt` | Per-contig length, coverage, circular yes/no |
+| `results/qc/{sample}/quast/report.tsv` | Assembly metrics: contigs, N50, length, GC% |
+| `results/annotation/{sample}/prokka/` | Predicted genes, rRNA, tRNA, functional annotation |
+| `results/summary/{sample}/summary_table.tsv` | One-glance summary merging QC and annotation |
+| `results/qc/{sample}/checkm2/` | Completeness and contamination *(if enabled)* |
+| `results/taxonomy/{sample}/gtdbtk/` | Taxonomic classification *(if enabled)* |
 | `results/methylation/example_output/` | Mock NanoMotif output illustrating the format |
 
 How to interpret these numbers is explained in

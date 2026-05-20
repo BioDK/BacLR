@@ -1,11 +1,18 @@
-# Environment for genome annotation and the methylation module.
-#   prokka   - fast bacterial genome annotation (core module)
-#   bakta    - richer functional annotation, light DB (extended module)
-#   nanomotif- methylation motif discovery (documented-only module)
+# Environment for genome annotation with Prokka (the core annotator).
+#   prokka          - fast bacterial genome annotation
+#   perl-xml-simple - Perl module Prokka needs; pinned here so the conda Perl
+#                     (not a system/Homebrew Perl) provides it
+#   perl-bioperl    - BioPerl, also required by Prokka
 #
-# Note: prokka and bakta can occasionally conflict on dependency versions.
-# If conda struggles to solve this environment, split prokka and bakta into
-# two separate env files - the workflow already attaches envs per rule.
+# Bakta and NanoMotif live in their own environment files (envs/bakta.yaml,
+# envs/nanomotif.yaml). They were split out because installing all three in
+# one environment makes the conda dependency solve fail. The Snakefile
+# attaches an environment per rule, so the split is transparent.
+#
+# macOS note: on Apple Silicon, create this environment with
+# CONDA_SUBDIR=osx-64 (see ONBOARDING / setup tutorial). The annotate_prokka
+# rule puts $CONDA_PREFIX/bin at the front of PATH so Prokka uses this
+# environment's Perl rather than any other Perl on the system.
 name: baclr-annotation
 channels:
   - conda-forge
@@ -13,5 +20,5 @@ channels:
 dependencies:
   - python >=3.9
   - prokka
-  - bakta
-  - nanomotif
+  - perl-xml-simple
+  - perl-bioperl

@@ -1,0 +1,14 @@
+# Environment for richer functional annotation with Bakta (extended module).
+#   bakta - standardised functional annotation; uses a light database (~3 GB)
+#
+# Split into its own file because Prokka + Bakta + NanoMotif together cannot
+# be solved as a single conda environment. Used by the bakta_annotate rule.
+#
+# macOS note: on Apple Silicon, create with CONDA_SUBDIR=osx-64.
+name: baclr-bakta
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - bakta

@@ -31,26 +31,26 @@ SAMPLE = config["sample"]
 # -----------------------------------------------------------------------------
 TARGETS = [
     f"results/filtered_reads/{SAMPLE}.filtered.fastq.gz",
-    "results/qc/nanoplot_raw/NanoStats.txt",
-    "results/assembly/flye/assembly.fasta",
-    "results/qc/quast/report.tsv",
-    f"results/annotation/prokka/{SAMPLE}.gff",
-    "results/summary/summary_table.tsv",
+    f"results/qc/{SAMPLE}/nanoplot_raw/NanoStats.txt",
+    f"results/assembly/{SAMPLE}/flye/assembly.fasta",
+    f"results/qc/{SAMPLE}/quast/report.tsv",
+    f"results/annotation/{SAMPLE}/prokka/{SAMPLE}.gff",
+    f"results/summary/{SAMPLE}/summary_table.tsv",
 ]
 
 # Extended modules - real rules, only run when switched on in config.
 if config["run_checkm"]:
-    TARGETS.append("results/qc/checkm2/quality_report.tsv")
+    TARGETS.append(f"results/qc/{SAMPLE}/checkm2/quality_report.tsv")
 if config["run_bakta"]:
-    TARGETS.append(f"results/annotation/bakta/{SAMPLE}.gff3")
+    TARGETS.append(f"results/annotation/{SAMPLE}/bakta/{SAMPLE}.gff3")
 
 # Documented-only modules - rules exist so the workflow is complete, but they
 # need large databases / special input data (see docs/). Keep these false in
 # config.yaml unless you have set up the prerequisites.
 if config["run_gtdbtk"]:
-    TARGETS.append("results/taxonomy/gtdbtk/gtdbtk.bac120.summary.tsv")
+    TARGETS.append(f"results/taxonomy/{SAMPLE}/gtdbtk/gtdbtk.bac120.summary.tsv")
 if config["run_nanomotif"]:
-    TARGETS.append("results/methylation/nanomotif/motifs.tsv")
+    TARGETS.append(f"results/methylation/{SAMPLE}/nanomotif/motifs.tsv")
 
 
 rule all:
@@ -71,9 +71,9 @@ rule nanoplot_raw:
     input:
         config["raw_reads"]
     output:
-        stats="results/qc/nanoplot_raw/NanoStats.txt"
+        stats="results/qc/{sample}/nanoplot_raw/NanoStats.txt"
     params:
-        outdir="results/qc/nanoplot_raw"
+        outdir="results/qc/{sample}/nanoplot_raw"
     threads:
         config["threads"]
     conda:
@@ -119,10 +119,10 @@ rule assemble_flye:
     input:
         "results/filtered_reads/{sample}.filtered.fastq.gz"
     output:
-        fasta="results/assembly/flye/assembly.fasta",
-        info="results/assembly/flye/assembly_info.txt"
+        fasta="results/assembly/{sample}/flye/assembly.fasta",
+        info="results/assembly/{sample}/flye/assembly_info.txt"
     params:
-        outdir="results/assembly/flye",
+        outdir="results/assembly/{sample}/flye",
         genome_size=config["genome_size"],
         mode=config["flye_mode"]
     threads:
@@ -142,11 +142,11 @@ rule assemble_flye:
 # -----------------------------------------------------------------------------
 rule quast_qc:
     input:
-        "results/assembly/flye/assembly.fasta"
+        "results/assembly/{sample}/flye/assembly.fasta"
     output:
-        "results/qc/quast/report.tsv"
+        "results/qc/{sample}/quast/report.tsv"
     params:
-        outdir="results/qc/quast"
+        outdir="results/qc/{sample}/quast"
     threads:
         config["threads"]
     conda:
@@ -159,21 +159,29 @@ rule quast_qc:
 # Genome annotation with Prokka (default annotator).
 # Predicts genes (CDS), rRNA, tRNA and assigns putative functions.
 # Prokka requires its output directory to not already exist, hence the rm -rf.
+#
+# PATH note: Prokka is a Perl program and its scripts use a "#!/usr/bin/env
+# perl" shebang. On a machine with another Perl earlier on PATH (e.g. a
+# Homebrew Perl on macOS), that wrong Perl gets used and Prokka fails to find
+# its modules. Putting $CONDA_PREFIX/bin at the front of PATH forces Prokka to
+# use the Perl from its own conda environment. This is portable - it works on
+# any machine because $CONDA_PREFIX is set by conda when the env is activated.
 # -----------------------------------------------------------------------------
 rule annotate_prokka:
     input:
-        "results/assembly/flye/assembly.fasta"
+        "results/assembly/{sample}/flye/assembly.fasta"
     output:
-        gff="results/annotation/prokka/{sample}.gff",
-        txt="results/annotation/prokka/{sample}.txt"
+        gff="results/annotation/{sample}/prokka/{sample}.gff",
+        txt="results/annotation/{sample}/prokka/{sample}.txt"
     params:
-        outdir="results/annotation/prokka",
+        outdir="results/annotation/{sample}/prokka",
         prefix="{sample}"
     threads:
         config["threads"]
     conda:
         "envs/annotation.yaml"
     shell:
+        "export PATH=\"$CONDA_PREFIX/bin:$PATH\" && "
         "rm -rf {params.outdir} && "
         "prokka {input} --outdir {params.outdir} --prefix {params.prefix} "
         "--cpus {threads} --force"
@@ -185,10 +193,10 @@ rule annotate_prokka:
 # -----------------------------------------------------------------------------
 rule summarize_results:
     input:
-        quast="results/qc/quast/report.tsv",
-        gff=f"results/annotation/prokka/{SAMPLE}.gff"
+        quast="results/qc/{sample}/quast/report.tsv",
+        gff="results/annotation/{sample}/prokka/{sample}.gff"
     output:
-        "results/summary/summary_table.tsv"
+        "results/summary/{sample}/summary_table.tsv"
     conda:
         "envs/qc.yaml"
     shell:
@@ -208,11 +216,11 @@ rule summarize_results:
 # -----------------------------------------------------------------------------
 rule checkm2_qc:
     input:
-        "results/assembly/flye/assembly.fasta"
+        "results/assembly/{sample}/flye/assembly.fasta"
     output:
-        "results/qc/checkm2/quality_report.tsv"
+        "results/qc/{sample}/checkm2/quality_report.tsv"
     params:
-        outdir="results/qc/checkm2",
+        outdir="results/qc/{sample}/checkm2",
         db=config["checkm2_db"]
     threads:
         config["threads"]
@@ -230,17 +238,17 @@ rule checkm2_qc:
 # -----------------------------------------------------------------------------
 rule bakta_annotate:
     input:
-        "results/assembly/flye/assembly.fasta"
+        "results/assembly/{sample}/flye/assembly.fasta"
     output:
-        gff="results/annotation/bakta/{sample}.gff3"
+        gff="results/annotation/{sample}/bakta/{sample}.gff3"
     params:
-        outdir="results/annotation/bakta",
+        outdir="results/annotation/{sample}/bakta",
         prefix="{sample}",
         db=config["bakta_db"]
     threads:
         config["threads"]
     conda:
-        "envs/annotation.yaml"
+        "envs/bakta.yaml"
     shell:
         "bakta {input} --output {params.outdir} --prefix {params.prefix} "
         "--db {params.db} --threads {threads} --force"
@@ -259,12 +267,12 @@ rule bakta_annotate:
 # -----------------------------------------------------------------------------
 rule gtdbtk_classify:
     input:
-        "results/assembly/flye/assembly.fasta"
+        "results/assembly/{sample}/flye/assembly.fasta"
     output:
-        "results/taxonomy/gtdbtk/gtdbtk.bac120.summary.tsv"
+        "results/taxonomy/{sample}/gtdbtk/gtdbtk.bac120.summary.tsv"
     params:
-        indir="results/assembly/flye",
-        outdir="results/taxonomy/gtdbtk",
+        indir="results/assembly/{sample}/flye",
+        outdir="results/taxonomy/{sample}/gtdbtk",
         db=config["gtdbtk_db"]
     threads:
         config["threads"]
@@ -285,16 +293,16 @@ rule gtdbtk_classify:
 # -----------------------------------------------------------------------------
 rule nanomotif_methylation:
     input:
-        assembly="results/assembly/flye/assembly.fasta",
-        pileup="results/methylation/modkit_pileup.bed"
+        assembly="results/assembly/{sample}/flye/assembly.fasta",
+        pileup="results/methylation/{sample}/modkit_pileup.bed"
     output:
-        "results/methylation/nanomotif/motifs.tsv"
+        "results/methylation/{sample}/nanomotif/motifs.tsv"
     params:
-        outdir="results/methylation/nanomotif"
+        outdir="results/methylation/{sample}/nanomotif"
     threads:
         config["threads"]
     conda:
-        "envs/annotation.yaml"
+        "envs/nanomotif.yaml"
     shell:
         "nanomotif motif_discovery {input.assembly} {input.pileup} "
         "--out {params.outdir} --threads {threads}"
