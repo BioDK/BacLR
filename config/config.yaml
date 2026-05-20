@@ -11,12 +11,14 @@
 
 # --- Sample identity ---------------------------------------------------------
 # A short label used in output filenames. Keep it filesystem-safe (no spaces).
-sample: "sample"
+sample: "bsubtilis_MB9_B6"
 
 # --- Input data --------------------------------------------------------------
 # Path to the raw Oxford Nanopore reads (FASTQ, gzipped is fine).
 # This file lives under data/raw/ and is git-ignored (do not commit raw reads).
-raw_reads: "data/raw/sample.fastq.gz"
+# Dataset: Bacillus subtilis MB9_B6, ONT MinION, ENA run SRR10390699,
+# first 100,000 reads (~675 Mb, ~160x coverage). See data/README.md.
+raw_reads: "data/raw/bsubtilis_MB9_B6_ONT_100k.fastq.gz"
 
 # --- Expected genome size ----------------------------------------------------
 # Flye uses this as a hint, not a hard constraint. Set it to the approximate
@@ -24,8 +26,8 @@ raw_reads: "data/raw/sample.fastq.gz"
 #   Escherichia coli       ~4.6m
 #   Lactococcus lactis     ~2.5m
 #   Bacillus subtilis      ~4.2m
-# Update this AFTER you have chosen your dataset (see data/README.md).
-genome_size: "4.6m"
+# Current dataset is Bacillus subtilis -> 4.2m.
+genome_size: "4.2m"
 
 # --- Compute -----------------------------------------------------------------
 # Number of CPU threads available to multi-threaded rules.

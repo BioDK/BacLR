@@ -5,19 +5,37 @@ FASTQ files are large, and raw data belongs in a data archive, not in git. The
 `data/raw/` directory is git-ignored. This file records which dataset to use
 and how to obtain it.
 
-## Dataset to use
-
-> **Status: to be finalised.**
-> The exact accession is selected in the run session. The criteria below
-> explain how it is chosen; fill in the chosen accession when known.
+## Dataset in use
 
 | Field | Value |
 |---|---|
-| Organism | _to be filled in_ |
-| Sequencing technology | Oxford Nanopore (long-read) |
-| Approximate genome size | _to be filled in_ (set `genome_size` in `config/config.yaml`) |
-| Source | NCBI SRA / ENA |
-| Accession | _to be filled in_ |
+| Organism | *Bacillus subtilis* strain MB9_B6 |
+| Sequencing technology | Oxford Nanopore MinION (long-read, WGS) |
+| Approximate genome size | ~4.2 Mb (`genome_size: "4.2m"` in `config/config.yaml`) |
+| Source | ENA (European Nucleotide Archive) |
+| BioProject | PRJNA587401 |
+| Experiment | SRX7091076 |
+| Run accession | SRR10390699 |
+| Subset used | first 100,000 reads |
+| Local file | `data/raw/bsubtilis_MB9_B6_ONT_100k.fastq.gz` |
+
+### Why this dataset
+
+*Bacillus subtilis* is a small, well-characterised single-chromosome bacterium
+on the project's preferred-organism list. The 100,000-read subset is ~675 Mb of
+sequence, giving roughly 160x coverage of the ~4.2 Mb genome — comfortably
+enough for a confident long-read assembly while still small enough to download
+and assemble within a one-day sprint.
+
+### Read statistics (100k-read subset)
+
+| Metric | Value |
+|---|---|
+| Reads | 100,000 |
+| Total bases | ~675 Mb |
+| Mean read length | ~6,750 bp |
+| Maximum read length | ~109 kb |
+| Estimated coverage | ~160x (genome ~4.2 Mb) |
 
 ## Selection criteria
 
@@ -40,32 +58,27 @@ guaranteed fast, well-documented run. Either is fine.
 
 ## How to download
 
-Once an accession is chosen, download with the SRA Toolkit:
+A download script is provided:
+[`download_Bacillus_OxfordNanoporeMinION_ena_demo.sh`](download_Bacillus_OxfordNanoporeMinION_ena_demo.sh).
+Run it from the repository root:
 
 ```bash
-mkdir -p data/raw
-
-# Replace SRRXXXXXXX with the chosen accession.
-prefetch SRRXXXXXXX
-fasterq-dump SRRXXXXXXX --outdir data/raw
-
-# Compress and name it to match config/config.yaml (raw_reads:).
-gzip data/raw/SRRXXXXXXX.fastq
-mv data/raw/SRRXXXXXXX.fastq.gz data/raw/sample.fastq.gz
+bash data/download_Bacillus_OxfordNanoporeMinION_ena_demo.sh
 ```
 
-Or download the FASTQ directly from ENA (often simpler - ENA serves gzipped
-FASTQ over plain HTTP/FTP, no toolkit needed):
+The script queries ENA for run `SRR10390699`, streams the gzipped FASTQ, keeps
+the first 100,000 reads, and writes the result to
+`data/raw/bsubtilis_MB9_B6_ONT_100k.fastq.gz` — the path `config/config.yaml`
+points at. ENA serves gzipped FASTQ over plain HTTP, so no SRA Toolkit is
+needed. Download logs go to `data/logs/` (git-ignored).
 
-```bash
-mkdir -p data/raw
-# Get the FASTQ URL from the ENA record for the accession, then:
-wget -O data/raw/sample.fastq.gz "<ENA_FASTQ_URL>"
-```
+The raw FASTQ (~672 MB) is **not committed** — `data/raw/` is git-ignored.
+Each person runs the download script once on their own machine.
 
-After downloading, point the workflow at the file by checking that
-`raw_reads:` in `config/config.yaml` matches `data/raw/sample.fastq.gz`, and set
-`genome_size:` to the organism's approximate genome size.
+After downloading, confirm the workflow is pointed at the file: `raw_reads:` in
+`config/config.yaml` should read
+`data/raw/bsubtilis_MB9_B6_ONT_100k.fastq.gz` and `genome_size:` should be
+`4.2m`.
 
 ## Limitations
 

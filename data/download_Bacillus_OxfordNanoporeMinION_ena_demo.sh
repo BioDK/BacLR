@@ -11,7 +11,7 @@ N_READS=100000
 N_LINES=$((N_READS * 4))
 
 RAW_DIR="data/raw"
-LOG_DIR="logs"
+LOG_DIR="data/logs"
 META_FILE="${RAW_DIR}/${RUN}_ena_files.tsv"
 OUT_FILE="${RAW_DIR}/${SAMPLE}.fastq.gz"
 
