@@ -1,0 +1,14 @@
+# Environment for read QC and filtering.
+#   chopper  - quality/length filtering of long reads (successor to NanoFilt)
+#   nanoplot - read-length and quality summary plots
+#   nanofilt - the legacy filter named in the job ad; installed so the tool is
+#              available if you want to compare it with chopper.
+name: baclr-filtering
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - chopper
+  - nanoplot
+  - nanofilt

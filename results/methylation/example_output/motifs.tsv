@@ -1,0 +1,6 @@
+contig	motif	mod_type	mod_position	n_motif	n_modified	methylation_degree
+contig_1	GATC	6mA	1	4612	4585	0.994
+contig_1	CCWGG	5mC	1	3187	3090	0.970
+contig_1	GANTC	6mA	1	2034	1962	0.965
+contig_1	GCGGCCGC	4mC	3	118	74	0.627
+contig_2	GATC	6mA	1	96	95	0.990

@@ -1,0 +1,9 @@
+# Environment for long-read de novo assembly.
+#   flye - long-read assembler for bacterial (and other) genomes
+name: baclr-assembly
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - flye >=2.9

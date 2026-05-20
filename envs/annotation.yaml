@@ -1,0 +1,17 @@
+# Environment for genome annotation and the methylation module.
+#   prokka   - fast bacterial genome annotation (core module)
+#   bakta    - richer functional annotation, light DB (extended module)
+#   nanomotif- methylation motif discovery (documented-only module)
+#
+# Note: prokka and bakta can occasionally conflict on dependency versions.
+# If conda struggles to solve this environment, split prokka and bakta into
+# two separate env files - the workflow already attaches envs per rule.
+name: baclr-annotation
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - prokka
+  - bakta
+  - nanomotif

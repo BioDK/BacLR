@@ -1,0 +1,13 @@
+# Environment for taxonomic classification.
+#   gtdbtk - places the genome in the standardised GTDB taxonomy
+#
+# DOCUMENTED-ONLY: GTDB-Tk needs a ~110 GB reference database, so this module
+# is not run in the one-day sprint. The environment file is provided so the
+# step is reproducible if the database is available. See docs/tool_principles.md.
+name: baclr-taxonomy
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - gtdbtk >=2.3

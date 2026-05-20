@@ -1,0 +1,13 @@
+# Environment for assembly QC and the summary script.
+#   quast   - assembly metrics (contigs, N50, length, GC%)
+#   checkm2 - genome completeness & contamination (extended module)
+#   pandas  - used by scripts/make_summary_table.py
+name: baclr-qc
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - quast >=5.2
+  - checkm2
+  - pandas
