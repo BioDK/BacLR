@@ -144,6 +144,7 @@ How to interpret these numbers is explained in
 
 ## Documentation
 
+- [`docs/setup_tutorial.md`](docs/setup_tutorial.md) — step-by-step setup on a new machine (start here)
 - [`docs/workflow_overview.md`](docs/workflow_overview.md) — the pipeline at a glance
 - [`docs/tool_principles.md`](docs/tool_principles.md) — what every tool does, why, and how to read its output
 - [`docs/methylation_design.md`](docs/methylation_design.md) — design and data requirements of the methylation module
