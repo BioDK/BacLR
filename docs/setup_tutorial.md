@@ -252,6 +252,17 @@ If you see an error instead, do not run for real — fix it first.
 
 ## 7. Run it for real
 
+**Before the first run — check your conda version.** Snakemake's `--use-conda`
+requires conda **24.7.1 or newer**. Check with `conda --version`. If it is
+older, install a modern conda *into the snakemake environment* (this leaves
+your system conda untouched):
+
+```bash
+conda install -n baclr-snakemake -c conda-forge 'conda>=24.7.1' -y
+```
+
+Then run the pipeline:
+
 ```bash
 # still inside the baclr-snakemake environment
 
@@ -311,6 +322,8 @@ Rules of thumb:
 | `conda create` fails: "nothing provides ..." | A | env created as `arm64`, no builds exist | Add the `CONDA_SUBDIR=osx-64` prefix (section 3) |
 | `--use-conda` env build fails | A | Snakemake built its envs as `arm64` | Prefix the run with `CONDA_SUBDIR=osx-64` (section 7) |
 | Conda solve takes very long | A | `osx-64` emulation + large package index | Normal under emulation; let it run, do not interrupt |
+| `CreateCondaEnvironmentException: Conda must be version 24.7.1 or later` | I + A | system conda too old for Snakemake's `--use-conda` | Install a modern conda *into* the snakemake env (does not touch your base conda): `conda install -n baclr-snakemake -c conda-forge 'conda>=24.7.1' -y` |
+| QUAST fails: `No module named 'distutils'` | I + A | QUAST needs `distutils`, removed in Python 3.12 | Already fixed: `envs/qc.yaml` pins `python<3.12`. If hit, `git pull origin main` and let Snakemake rebuild the qc env |
 | Prokka: `Can't locate XML/Simple.pm` | I + A | wrong Perl earlier on PATH (often Homebrew) | Prepend `$CONDA_PREFIX/bin` to PATH (section 4) |
 | Combined Prokka+Bakta env will not solve | I + A | known dependency conflict | Use the separate environments (section 3) |
 | `snakemake -n` WildcardError | I + A | inconsistent rule paths | Should not happen on current `main`; `git pull origin main` |

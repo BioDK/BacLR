@@ -2,12 +2,16 @@
 #   quast   - assembly metrics (contigs, N50, length, GC%)
 #   checkm2 - genome completeness & contamination (extended module)
 #   pandas  - used by scripts/make_summary_table.py
+#
+# Python is pinned to <3.12: QUAST (through 5.3.x) imports the standard-library
+# module `distutils`, which was removed in Python 3.12. Without this pin, conda
+# installs Python 3.12+ and QUAST fails with "No module named 'distutils'".
 name: baclr-qc
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python >=3.9
+  - python >=3.9,<3.12
   - quast >=5.2
   - checkm2
   - pandas
