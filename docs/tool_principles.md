@@ -3,10 +3,10 @@
 This document explains the *why* behind each step of the pipeline, not just the
 commands. Each section follows the same structure: what the tool does, why it
 is used here, what input it expects, what output it produces, how to read the
-result, and how it connects to the EpiFerm project at UCPH FOOD.
+result, and why it matters in the workflow.
 
-If you read only one document in this repository to prepare for an interview,
-read this one.
+If you want to understand how the pipeline works rather than just run it, this
+is the document to read.
 
 ---
 
@@ -19,9 +19,9 @@ follow from this. First, reads are *long* - often tens of kilobases - because
 there is no need to chop the DNA into short fragments. Second, the raw signal
 carries information about base modifications such as methylation, because a
 methylated base disturbs the current differently from an unmethylated one. Both
-properties matter for this project: long reads make bacterial genome
-reconstruction much easier, and the methylation signal is what the EpiFerm
-project ultimately cares about.
+properties matter for this pipeline: long reads make bacterial genome
+reconstruction much easier, and the methylation signal is what the optional
+methylation module is built to analyse.
 
 ---
 
@@ -39,10 +39,9 @@ normal for older chemistry and Q15+ for modern high-accuracy basecalling.
 
 **What the tool does.** chopper scans every read and discards those whose mean
 quality or length fall below a cutoff. It is the maintained successor to
-NanoFilt - same author, same purpose, written in Rust so it is faster. The job
-ad names NanoFilt; chopper does the same job and is what the tool's own
-authors now recommend. Both are installed in `envs/filtering.yaml` so you can
-compare them.
+NanoFilt - same author, same purpose, written in Rust so it is faster. chopper
+is what the tool's own authors now recommend; both chopper and NanoFilt are
+installed in `envs/filtering.yaml` so you can compare them.
 
 **Why long-read data needs filtering.** A small number of very short or very
 low-quality reads add noise without adding useful information. Removing them
@@ -60,7 +59,7 @@ well under 20%) and retained enough total bases for good coverage. A useful
 rule of thumb: total filtered bases divided by genome size should give at least
 ~30-50x coverage for a confident bacterial assembly.
 
-**EpiFerm relevance.** Clean input is the foundation. Every downstream
+**Why it matters.** Clean input is the foundation. Every downstream
 conclusion about genome structure or methylation rests on the reads, so being
 deliberate about filtering is a basic reproducibility and quality habit.
 
@@ -82,7 +81,7 @@ data you have - and therefore how aggressively you can filter.
 median quality, and total bases (for coverage). A long tail of very short reads
 is normal and is what filtering trims.
 
-**EpiFerm relevance.** A quick, honest look at data quality before committing
+**Why it matters.** A quick, honest look at data quality before committing
 compute is exactly the habit a reproducible-workflow role expects.
 
 ---
@@ -126,9 +125,10 @@ yes/no), and an assembly graph.
 near the expected genome size, marked circular, with even coverage. Many short
 contigs or a total length far from expected is a warning sign.
 
-**EpiFerm relevance.** This is the "genome reconstruction" the job ad asks for.
-A contiguous, accurate assembly is the prerequisite for everything after it -
-you cannot map methylation onto genome structure you have not reconstructed.
+**Why it matters.** This is the genome-reconstruction step at the heart of the
+pipeline. A contiguous, accurate assembly is the prerequisite for everything
+after it - you cannot map methylation onto genome structure you have not
+reconstructed.
 
 ---
 
@@ -163,9 +163,9 @@ reads behave at specific sequence contexts across the genome. If the assembly
 is wrong - misjoined, contaminated, fragmented - methylation calls inherit
 those errors. Good assembly QC protects every downstream conclusion.
 
-**EpiFerm relevance.** The role values reproducible, quality-controlled
-workflows. QUAST is the explicit, documented QC gate between assembly and
-interpretation.
+**Why it matters.** QUAST is the explicit, documented QC gate between assembly
+and interpretation - it is what tells you whether an assembly is good enough to
+annotate and build on.
 
 ---
 
@@ -183,8 +183,8 @@ those marker genes. Missing markers imply missing genome (low completeness);
 markers present in extra copies imply foreign or duplicated sequence (high
 contamination). CheckM2 improves on the original CheckM by using a machine-
 learning model over gene content rather than fixed marker sets, which makes it
-more accurate and far easier to install - no `pplacer` dependency. The job ad
-names CheckM; CheckM2 is the modern equivalent and is what this pipeline uses.
+more accurate and far easier to install - no `pplacer` dependency. CheckM2 is
+the modern equivalent of the original CheckM and is what this pipeline uses.
 
 **Input:** `assembly.fasta` plus a ~3 GB CheckM2 database. **Output:**
 `quality_report.tsv` with a completeness and a contamination percentage.
@@ -198,7 +198,7 @@ contamination is better.
 checkm2 database --download --path db/checkm2
 ```
 
-**EpiFerm relevance.** Before claiming anything about a strain's genome or its
+**Why it matters.** Before claiming anything about a strain's genome or its
 methylation, you must know the genome is complete and clean. CheckM2 is the
 evidence for that claim.
 
@@ -236,9 +236,9 @@ gtdbtk classify_wf --genome_dir results/assembly/flye \
 ```
 Set `run_gtdbtk: true` in `config/config.yaml` once the database is in place.
 
-**EpiFerm relevance.** Strain identity is the anchor for strain-level work.
+**Why it matters.** Strain identity is the anchor for strain-level work.
 Knowing exactly which organism (and ideally which strain) you have is what lets
-you connect a genome and its methylation profile to a fermentation phenotype.
+you connect a genome and its methylation profile to an observed phenotype.
 
 ---
 
@@ -273,13 +273,14 @@ just a short sequence pattern. Annotation puts it in context: is the motif
 inside a gene promoter, in a coding region, near a regulatory element? That
 context is what turns "this motif is methylated" into a biological statement.
 
-**Restriction-modification and fermentation genes.** Annotation can flag
+**Restriction-modification systems.** Annotation can flag
 restriction-modification (R-M) systems - the methyltransferase/endonuclease
 pairs that are the usual *source* of bacterial methylation motifs. It can also
-flag genes relevant to fermentation (carbohydrate metabolism, proteolysis,
-stress response). Both are directly on-topic for EpiFerm.
+flag genes tied to specific metabolic functions (carbohydrate metabolism,
+proteolysis, stress response), which is what makes the annotation biologically
+useful.
 
-**EpiFerm relevance.** Annotation is the bridge between raw genome structure and
+**Why it matters.** Annotation is the bridge between raw genome structure and
 biological interpretation. It is what lets you say a methylation motif sits in a
 functionally meaningful place, and it identifies the R-M systems that explain
 where the methylation comes from.
@@ -313,8 +314,7 @@ the patterns that are methylated far more often than chance.
 restriction-modification systems (defence against foreign DNA), influences the
 timing of DNA replication, and can regulate gene expression. Strains that look
 nearly identical at the DNA-sequence level can differ in their methylation
-patterns, and that difference can affect phenotype - including traits relevant
-to fermentation.
+patterns, and that difference can affect phenotype.
 
 **Why plain FASTQ is not enough.** This is the key technical point. A standard
 FASTQ file contains base calls and quality scores but *not* modification
@@ -333,10 +333,10 @@ repository includes the rule, the design document, and a clearly-labelled mock
 output showing the format. This is honest and it demonstrates understanding of
 the real pipeline.
 
-**EpiFerm relevance.** Methylation profiling is the centre of the EpiFerm
-project. Understanding *exactly* what data and steps it requires - and being
-candid that plain FASTQ does not suffice - is more valuable than producing a
-result from data that cannot support it.
+**Why it matters.** Methylation profiling is what connects an assembled genome
+to its epigenetic layer. Understanding *exactly* what data and steps it
+requires - and being candid that plain FASTQ does not suffice - is more
+valuable than producing a result from data that cannot support it.
 
 ---
 
@@ -369,7 +369,7 @@ independent steps, fails loudly when a step fails, and records exactly what was
 done. Manual command sequences are easy to get wrong, hard to resume after a
 failure, and leave no record.
 
-**EpiFerm relevance.** The job ad explicitly asks for Snakemake/Nextflow and
-reproducible workflows. Expressing this pipeline as a Snakemake workflow - with
-per-rule environments and a separate config - is a direct demonstration of that
-skill.
+**Why it matters.** Expressing this pipeline as a Snakemake workflow - with
+per-rule conda environments and a separate config - is what makes the whole
+analysis reproducible: one command re-runs it, and the exact tools and settings
+used are recorded in the repository.

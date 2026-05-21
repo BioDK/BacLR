@@ -52,9 +52,9 @@ biologically perfect:
    pipeline assumes one organism.
 4. **Public and openly accessible** via SRA or ENA.
 
-A fermentation-relevant organism such as *Lactococcus lactis* ties the project
-most directly to the EpiFerm context; *E. coli* is the safest choice for a
-guaranteed fast, well-documented run. Either is fine.
+Any small bacterial isolate that meets these criteria works. *Escherichia
+coli* and *Bacillus subtilis* are well-documented choices with many public ONT
+datasets, so they are safe picks for a fast, reliable run.
 
 ## How to download
 

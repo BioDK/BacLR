@@ -10,11 +10,11 @@
 
 ## Why this folder exists
 
-The methylation module is the most relevant part of the pipeline for the
-EpiFerm project, but it cannot honestly be run on a FASTQ-only dataset. Rather
-than leave the module empty or fake a result, this folder shows exactly what a
-real output looks like and how to read it. That makes the intended analysis
-fully specified and reproducible for anyone who has the right input data.
+The methylation module cannot honestly be run on a FASTQ-only dataset (it
+needs raw-signal data — see the design document). Rather than leave the module
+empty or fake a result, this folder shows exactly what a real output looks
+like and how to read it. That makes the intended analysis fully specified and
+reproducible for anyone who has the right input data.
 
 ## Reading `motifs.tsv`
 

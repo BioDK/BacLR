@@ -78,9 +78,9 @@ adds the corresponding target only when the flag is on.
 
 ## Design choices worth knowing
 
-- **chopper instead of NanoFilt.** The job ad names NanoFilt; chopper is its
-  maintained successor (same author, same purpose, faster). Both are installed
-  so they can be compared. See [tool_principles.md](tool_principles.md).
+- **chopper instead of NanoFilt.** chopper is the maintained successor to
+  NanoFilt (same author, same purpose, faster). Both are installed so they can
+  be compared. See [tool_principles.md](tool_principles.md).
 - **CheckM2 instead of CheckM.** CheckM2 is more accurate and far easier to
   install (no `pplacer` dependency).
 - **Per-rule conda environments.** Each rule declares its own `envs/*.yaml`, so

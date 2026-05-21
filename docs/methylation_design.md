@@ -7,9 +7,6 @@ this repository includes the Snakemake rule, this design document, and a
 clearly-labelled mock output so the intended workflow is fully specified and
 reproducible by anyone who has the right data.
 
-For the EpiFerm project this is the most relevant part of the pipeline, so it
-is worth understanding precisely.
-
 ---
 
 ## 1. Why plain FASTQ is not enough
@@ -114,8 +111,8 @@ The realistic ways to obtain suitable data:
   ONT reference and benchmarking datasets do).
 - Use a dataset that already provides a modification-aware **modBAM**, skipping
   the basecalling step.
-- In a lab setting (such as EpiFerm), generate the data yourself - you control
-  basecalling and would simply choose a methylation-aware model.
+- In a lab setting, generate the data yourself - you control basecalling and
+  would simply choose a methylation-aware model.
 
 ---
 
@@ -141,11 +138,10 @@ recognition site of an active methyltransferase.
 
 ---
 
-## 5. Connecting methylation to EpiFerm
+## 5. Why methylation analysis matters
 
-The EpiFerm project links bacterial genome structure and methylation profiles
-to strain-level phenotypes such as fermentation performance. The methylation
-module connects to that goal in several concrete ways:
+Bacterial DNA methylation is biologically important in several ways, and the
+methylation module connects the pipeline to each of them:
 
 - **Restriction-modification (R-M) systems.** Most bacterial methylation motifs
   are the recognition sites of R-M systems. Annotation (Prokka/Bakta) flags the
@@ -158,13 +154,12 @@ module connects to that goal in several concrete ways:
 
 - **Phenotype links.** Methylation can influence gene regulation and replication
   timing. Differences in methylation between strains are candidate explanations
-  for differences in fermentation behaviour - which is the kind of hypothesis
-  EpiFerm sets out to test.
+  for differences in observable behaviour.
 
 - **Genomic context.** Overlaying methylation motifs on the annotation shows
   whether methylation sits in promoters, coding regions, or regulatory elements
   - the step that turns a methylation pattern into a biological interpretation.
 
 Being explicit that this needs raw-signal data, and specifying exactly which
-data and steps, is itself the demonstration of understanding the EpiFerm
-workflow asks for.
+data and steps, keeps the methylation module honest: it documents the real
+requirement rather than producing a result the input data cannot support.

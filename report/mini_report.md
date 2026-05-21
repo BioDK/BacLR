@@ -1,16 +1,15 @@
 # Mini-report: long-read bacterial genome reconstruction
 
-A compact write-up of a long-read bacterial genome analysis run, built as
-hands-on preparation for the EpiFerm Research Assistant position at UCPH FOOD.
+A compact write-up of a long-read bacterial genome analysis run with the BacLR
+pipeline.
 
 ---
 
 ## 1. Aim
 
 To build and run a reproducible long-read bacterial genome analysis workflow,
-and in doing so gain hands-on familiarity with the toolchain used for
-long-read bacterial genome reconstruction and methylation-aware annotation -
-the kind of workflow central to the EpiFerm project at UCPH FOOD.
+covering the standard toolchain for long-read bacterial genome reconstruction
+and methylation-aware annotation.
 
 The workflow takes raw Oxford Nanopore reads from a bacterial isolate and runs
 read filtering, de novo assembly, assembly QC, genome annotation, and a
@@ -145,16 +144,15 @@ output illustrating the result format is in
 This is a deliberate honesty choice - documenting the real requirement rather
 than fabricating a result the input data cannot support.
 
-## 9. Relevance to EpiFerm
+## 9. Significance
 
-This project mirrors core tasks of the EpiFerm Research Assistant role:
-reconstructing a bacterial genome from Oxford Nanopore reads, evaluating
-assembly quality, annotating genomic features, and framing a methylation-aware
-extension. These steps are the foundation for linking bacterial genome
-structure and methylation profiles to strain-level phenotypes such as
-fermentation performance. Building the workflow in Snakemake, with per-rule
-conda environments, also directly exercises the reproducible-workflow skills
-the position asks for.
+The run demonstrates a complete long-read bacterial genome analysis from raw
+reads to an annotated, quality-controlled genome: read filtering, de novo
+assembly, assembly QC, and annotation, with a documented methylation-aware
+extension. Reconstructing the genome accurately is the foundation for any
+downstream interpretation — including placing methylation patterns in genomic
+context. Building the workflow in Snakemake with per-rule conda environments
+makes the whole analysis reproducible and re-runnable with a single command.
 
 ## 10. Limitations
 
