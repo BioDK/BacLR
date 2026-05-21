@@ -225,7 +225,7 @@ rule checkm2_qc:
     threads:
         config["threads"]
     conda:
-        "envs/qc.yaml"
+        "envs/checkm2.yaml"
     shell:
         "checkm2 predict --input {input} --output-directory {params.outdir} "
         "--threads {threads} --database_path {params.db} --force"

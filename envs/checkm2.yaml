@@ -1,0 +1,15 @@
+# Environment for genome completeness & contamination with CheckM2
+# (extended module - used by the checkm2_qc rule, off by default).
+#   checkm2 - ML-based completeness/contamination estimation
+#
+# Split into its own file because CheckM2's Python requirement
+# (python <3.9, or >3.12) is incompatible with QUAST's (python <3.12).
+# The two tools cannot share one conda environment, so each has its own.
+#
+# macOS note: on Apple Silicon, create with CONDA_SUBDIR=osx-64.
+name: baclr-checkm2
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - checkm2
