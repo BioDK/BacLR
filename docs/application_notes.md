@@ -10,25 +10,49 @@ new toolchain quickly - not a claim of prior expertise.
 
 ## CV bullet
 
-> Built a Snakemake-based long-read bacterial genome analysis workflow using
-> Oxford Nanopore data, including read filtering, Flye assembly, QUAST-based
-> assembly QC, genome annotation, and a documented methylation-aware NanoMotif
-> extension.
+The workflow has now been run end-to-end on a real Oxford Nanopore dataset
+(*Bacillus subtilis*), so the bullet says "built and ran" and can cite a
+concrete result. Pick the variant that fits your CV's space.
 
-A shorter variant:
+**Primary (recommended) — names the concrete outcome:**
 
-> Developed a reproducible Snakemake pipeline for long-read bacterial genome
-> reconstruction (read filtering, Flye assembly, QC, annotation) with a
-> documented methylation-analysis module.
+> Built and ran a reproducible Snakemake pipeline for long-read bacterial
+> genome reconstruction from Oxford Nanopore data — read filtering (chopper),
+> de novo assembly (Flye), assembly QC (QUAST) and annotation (Prokka) —
+> reconstructing a *Bacillus subtilis* genome as a single circular chromosome,
+> with a documented methylation-aware (NanoMotif) extension.
+
+**Shorter — one line:**
+
+> Built and ran a reproducible Snakemake long-read bacterial genome pipeline
+> (Oxford Nanopore): read filtering, Flye assembly, QUAST QC and Prokka
+> annotation, plus a documented methylation-analysis module.
+
+**Skills-led — if your CV groups bullets by skill:**
+
+> Long-read bacterial genomics: developed a Snakemake workflow with per-rule
+> conda environments that reconstructs a bacterial genome from Oxford Nanopore
+> reads (chopper, Flye, QUAST, Prokka) and frames a NanoMotif methylation
+> module; reproducible and documented end to end.
+
+> **Why "built *and ran*" matters:** the earlier draft said only "built."
+> You have now executed the full pipeline and produced a real assembly, so
+> "ran" is accurate — and a hiring manager reads "ran ... a *B. subtilis*
+> genome as a single circular chromosome" as evidence of actual hands-on work,
+> not just a repository. Keep the specifics; they are what make the bullet
+> credible. Do not inflate beyond this — you ran the core pipeline on one
+> dataset, which is exactly what the bullet claims.
 
 ---
 
 ## Cover letter sentence
 
-> To strengthen my preparation for this role, I recently built a compact
-> Snakemake-based long-read bacterial genome analysis workflow using Oxford
-> Nanopore data, covering read filtering, bacterial genome assembly, assembly
-> QC, annotation, and a methylation-aware extension.
+> To strengthen my preparation for this role, I recently built and ran a
+> compact Snakemake-based long-read bacterial genome analysis workflow on
+> Oxford Nanopore data — covering read filtering, de novo assembly, assembly
+> QC and annotation — which reconstructed a *Bacillus subtilis* genome as a
+> single circular chromosome, and I designed a methylation-aware extension on
+> top of it.
 
 ---
 
