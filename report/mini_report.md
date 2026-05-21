@@ -1,8 +1,7 @@
 # Mini-report: long-read bacterial genome reconstruction
 
-> **Status: template.** The results sections below are filled in after the
-> pipeline has been run on the chosen dataset. Placeholders are marked
-> `[ ... ]`. Sections describing method and rationale are already complete.
+A compact write-up of a long-read bacterial genome analysis run, built as
+hands-on preparation for the EpiFerm Research Assistant position at UCPH FOOD.
 
 ---
 
@@ -20,13 +19,16 @@ taxonomy, and methylation motif discovery.
 
 ## 2. Dataset
 
-- **Organism:** [ to be filled in ]
-- **Sequencing technology:** Oxford Nanopore long reads
-- **Accession / source:** [ SRA/ENA accession ]
-- **Approximate genome size:** [ ... Mb ]
-- **Why chosen:** a small, fast bacterial isolate suitable for a one-day run.
-  See [`data/README.md`](../data/README.md) for selection criteria and
-  download commands.
+- **Organism:** *Bacillus subtilis* strain MB9_B6
+- **Sequencing technology:** Oxford Nanopore MinION (long-read, whole-genome)
+- **Accession / source:** ENA run SRR10390699 (BioProject PRJNA587401),
+  first 100,000 reads
+- **Approximate genome size:** ~4.2 Mb
+- **Why chosen:** a small, well-characterised single-chromosome bacterium on
+  the project's preferred-organism list. The 100,000-read subset (~675 Mb) is
+  small enough to download and assemble within a one-day sprint while still
+  giving deep coverage. See [`data/README.md`](../data/README.md) for selection
+  criteria and the download script.
 
 ## 3. Workflow overview
 
@@ -39,51 +41,93 @@ The pipeline is implemented in Snakemake. Core steps (run on a laptop):
 5. **Annotation** - Prokka predicts genes, rRNA, tRNA, and functions.
 6. **Summary** - a Python script merges QC and annotation into one table.
 
-Optional modules (CheckM2, Bakta, GTDB-Tk, NanoMotif) are gated by flags in
-`config/config.yaml`. See [`docs/workflow_overview.md`](../docs/workflow_overview.md).
+Each rule runs in its own conda environment. Optional modules (CheckM2, Bakta,
+GTDB-Tk, NanoMotif) are gated by flags in `config/config.yaml`. See
+[`docs/workflow_overview.md`](../docs/workflow_overview.md).
+
+The run reported here completed all six core steps end-to-end.
+
+### Read filtering
+
+Of the 100,000 raw reads, chopper kept **65,857** (quality cutoff Q10, minimum
+length 1,000 bp), retaining ~568 Mb of sequence. The raw reads had a mean
+quality of Q11.4 and a read-length N50 of 17.4 kb; 83% of reads were above
+Q10. Removing the short and low-quality tail left a clean, high-coverage set
+for assembly.
 
 ## 4. Assembly results
 
 | Metric | Value |
 |---|---|
-| Number of contigs | [ ... ] |
-| Total length (bp) | [ ... ] |
-| Largest contig (bp) | [ ... ] |
-| N50 (bp) | [ ... ] |
-| GC content (%) | [ ... ] |
-| Circular contig(s) | [ from assembly_info.txt ] |
+| Number of contigs | 2 |
+| Total length (bp) | 4,087,131 |
+| Largest contig (bp) | 4,082,166 |
+| N50 (bp) | 4,082,166 |
+| GC content (%) | 43.88 |
+| Circular contig(s) | contig_2 (the chromosome) |
 
-[ One or two sentences: did the assembly come out as a single circular
-chromosome near the expected genome size? Any plasmids? ]
+Flye reconstructed the genome as **two contigs**:
+
+- **contig_2 - 4,082,166 bp, circular, 142x coverage.** This is the complete
+  *Bacillus subtilis* chromosome, recovered as a single circular molecule -
+  the ideal outcome for a long-read bacterial assembly.
+- **contig_3 - 4,965 bp, 237x coverage**, flagged by Flye as a repeat element.
+  Its short length and high coverage are consistent with a small extrachromosomal
+  element or a high-copy repeat rather than part of the main chromosome.
 
 ## 5. QC interpretation
 
-[ Interpret the QUAST numbers against expectations for the organism. Is the
-contig count low? Is total length close to the expected genome size? Is N50
-large (i.e. the assembly concentrated in long contigs)? Is GC% as expected?
-What does coverage - total filtered bases / genome size - work out to? ]
+The QUAST numbers indicate a high-quality assembly:
+
+- **Contig count (2)** is very low, as expected for a single-chromosome
+  bacterium. The assembly is not fragmented.
+- **Total length (4.09 Mb)** is close to the expected ~4.2 Mb for
+  *B. subtilis*. The small shortfall is normal for an unpolished long-read
+  assembly and for the use of a 100k-read subset rather than the full run.
+- **N50 (4.08 Mb)** equals the chromosome length - the assembly is concentrated
+  in one long contig, which is the strongest possible signal of contiguity.
+- **GC content (43.88%)** matches the *B. subtilis* reference (~43.5%), a good
+  sign that the assembly is the expected organism and free of obvious
+  contamination.
+- **Coverage:** the ~568 Mb of filtered reads over a ~4.2 Mb genome gives
+  roughly 135x coverage (Flye's own estimate), comfortably above the depth
+  needed for a confident assembly.
 
 ## 6. Annotation results
 
 | Feature | Count |
 |---|---|
-| CDS | [ ... ] |
-| tRNA | [ ... ] |
-| rRNA | [ ... ] |
-| tmRNA | [ ... ] |
+| CDS | 6,770 |
+| tRNA | 86 |
+| rRNA | 33 |
+| tmRNA | 1 |
 
-[ Are the feature counts in the expected range for a bacterium of this size
-(a few thousand CDS, dozens of tRNAs, a few rRNA operons)? Note anything
-interesting - e.g. genes related to restriction-modification systems or to
-fermentation-relevant metabolism. ]
+The tRNA count (86) and rRNA count (33, i.e. roughly ten rRNA operons) are in
+the expected range for a *B. subtilis*-sized genome, and the single tmRNA is
+as expected.
 
-## 7. Taxonomy / completeness results (if available)
+The CDS count (6,770) is **higher than the ~4,200 protein-coding genes** in
+*B. subtilis* reference genomes. This is a known effect of annotating an
+**unpolished long-read assembly**: residual indel errors introduce spurious
+frameshifts, which causes gene callers to split one real gene into several
+shorter predicted ORFs. The fix is an assembly polishing step before
+annotation (see Limitations and Next steps). The inflated count is reported
+honestly here rather than glossed over - it is a feature of the input data,
+not of the organism.
 
-[ If CheckM2 was run: completeness % and contamination %, and whether they
-meet the high-quality bar (completeness > ~95%, contamination < ~5%). If
-GTDB-Tk was run: the assigned classification and whether it matches the
-expected organism. If neither was run, state that and refer to
-`docs/tool_principles.md` for how they would be applied. ]
+## 7. Taxonomy / completeness results
+
+The completeness/contamination (CheckM2) and taxonomy (GTDB-Tk) modules were
+**not run** in this sprint. CheckM2 needs a ~3 GB database and GTDB-Tk a
+~110 GB database; setting these up was out of scope for the one-day run. The
+Snakemake rules and conda environments for both are in place, so they can be
+enabled (`run_checkm`, `run_gtdbtk` in `config/config.yaml`) once the databases
+are available. See [`docs/tool_principles.md`](../docs/tool_principles.md) for
+what each would tell us - in short, CheckM2 would confirm the genome is
+complete and uncontaminated, and GTDB-Tk would formally confirm the organism
+is *B. subtilis*. The QC evidence already gathered (GC%, genome size, single
+circular chromosome) is consistent with a complete, correct *B. subtilis*
+genome.
 
 ## 8. Methylation-aware extension
 
@@ -114,21 +158,37 @@ the position asks for.
 
 ## 10. Limitations
 
-- A small dataset was chosen for speed; deeper sequencing could give a more
-  contiguous assembly.
-- No polishing step was applied after assembly.
-- CheckM2 / Bakta / GTDB-Tk were [ run / not run - state which ] depending on
-  database availability within the one-day window.
+- A 100,000-read subset was used for speed; the full run would give slightly
+  more complete coverage.
+- **No polishing step was applied after assembly.** This is the most likely
+  cause of the inflated CDS count (section 6); adding a polishing step (e.g.
+  Medaka) would correct residual indels and bring the gene count closer to the
+  expected ~4,200.
+- CheckM2, Bakta, and GTDB-Tk were not run - their databases were out of scope
+  for the one-day window. The rules and environments are in place.
 - The methylation module was documented, not executed, because the dataset
   lacks the required raw-signal data (see section 8).
-- Software versions in the conda environments are not strictly pinned.
+- Software versions in the conda environments are not strictly pinned (a few
+  lower bounds are set where needed for compatibility).
 
 ## 11. Next steps
 
-- Run the extended tier (CheckM2, Bakta) and GTDB-Tk taxonomy with their
-  databases in place.
+- Add an assembly **polishing step** (Medaka) before annotation, and re-check
+  the CDS count.
+- Run the extended tier (CheckM2 for completeness/contamination, Bakta for
+  richer annotation) and GTDB-Tk for taxonomy, with their databases in place.
 - Obtain a dataset with raw POD5 signal and run the full methylation pipeline
   end-to-end (Dorado modified-base basecalling -> modkit -> NanoMotif).
-- Add an assembly polishing step.
 - Pin exact software versions for stricter reproducibility, and add tests for
   the helper scripts.
+
+---
+
+## Appendix: run environment
+
+- Pipeline run on macOS (Apple Silicon) with conda environments built as
+  `osx-64` under Rosetta 2.
+- Tool versions: Flye 2.9.6, QUAST 5.3.0, Prokka 1.15.6, chopper 0.11.0,
+  NanoPlot 1.46.2, Snakemake 9.5.1.
+- Full workflow and setup instructions: [`../README.md`](../README.md) and
+  [`../docs/setup_tutorial.md`](../docs/setup_tutorial.md).
