@@ -100,6 +100,9 @@ ends with "To activate this environment..." — that means it succeeded.
 the bio-tool environments with `CONDA_SUBDIR=osx-64`. The Snakemake
 environment is pure Python and never needs the prefix on either track.
 
+**Stuck at solving enviroment.** If you get stuck at solving enviroment, then try to use "mamba create" instead of "conda create", becuase Mamba solves dependencies much faster.  Run the command line below to install mamba: 
+```conda install -n base -c conda-forge mamba -y```
+
 ### Track I — Intel Mac
 
 ```bash
